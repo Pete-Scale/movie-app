@@ -30,30 +30,45 @@
       <input id="add-movie" type="submit" value="Add a Movie, Yo!">
     </form>
 
+    <div id="movies-view"></div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
       // Initial array of movies
       var movies = ["The Matrix", "The Notebook", "Mr. Nobody", "The Lion King"];
-
-      for (var i = 0; i < movies.length; i++){
-        
-        $('#buttons-view').html("<button>" + movies[i] + "</button>")
-        $('button').append()
-      }
-      console.log('#buttons-view')
+      var queryURL = "http://www.omdbapi.com/?apikey=trilogy" 
+      var buttonsView = $('#buttons-view');
+      var userInput = $('#movie-input');
 
       // Function for displaying movie data
       function renderButtons() {
+        buttonsView.empty();
+        for (var i = 0; i < movies.length; i++){
+          var button = $('<button>').text(movies[i]).addClass('movie-btn');
+          buttonsView.append(button);
+        }
+      };
 
-        // YOUR CODE GOES HERE
-
-      }
+      buttonsView.on('click', '.movie-btn', function(event){
+        var title = ($(this).text());
+        $.ajax({
+          url: queryURL + "&t=" + title
+        }).then(function(movieData){
+          var rating = $('<p>').text(movieData.Rated);
+          var released = $('<p>').text(movieData.Released);
+          var plot = $('<p>').text(movieData.Plot);
+          var img = $('<img>').attr('src', movieData.Poster);
+          $('#movies-view').prepend(rating, released, plot, img);
+        })
+      });
 
       // This function handles events where one button is clicked
-      $("#add-movie").on("click", function() {
-
+      $("#add-movie").on("click", function(event) {
+        event.preventDefault();
         // YOUR CODE GOES HERE
-
+        var newMovie = userInput.val();
+        movies.push(newMovie);
+        renderButtons();
       });
 
       // Calling the renderButtons function to display the initial list of movies
